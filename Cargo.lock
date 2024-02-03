@@ -211,6 +211,7 @@ name = "easy-captcha"
 version = "0.1.0"
 dependencies = [
  "base64",
+ "evalexpr",
  "font-kit",
  "lazy_static",
  "log",
@@ -241,6 +242,12 @@ checksum = "87f253bc5c813ca05792837a0ff4b3a580336b224512d48f7eda1d7dd9210787"
 dependencies = [
  "num-traits",
 ]
+
+[[package]]
+name = "evalexpr"
+version = "11.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63b41cb9dd076076058a4523f009c900c582279536d0b2e45a29aa930e083cc5"
 
 [[package]]
 name = "fastrand"

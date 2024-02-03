@@ -49,7 +49,7 @@ impl SpecCaptcha {
     }
 
     /// 生成验证码图形
-    fn graphics_image(&mut self, str: &Vec<char>, out: impl Write) -> bool {
+    pub(crate) fn graphics_image(&mut self, str: &Vec<char>, out: impl Write) -> bool {
         let width = self.captcha.width;
         let height = self.captcha.height;
 
@@ -105,12 +105,7 @@ impl SpecCaptcha {
                 .unwrap();
 
             let f_y = height - ((height - bounds.height() as i32) >> 1);
-            println!("A {}, {}, {}", f_w, f_sp, f_y);
-            println!(
-                "B {}, {}",
-                (i as i32 * f_w + f_sp + 3) as f32,
-                f_y as f32 - 3.,
-            );
+
             dt.draw_glyphs(
                 &font,
                 font_size,

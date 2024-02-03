@@ -14,7 +14,7 @@ use std::sync::Arc;
 /// 验证码抽象类
 pub(crate) struct Captcha {
     /// 随机数工具类
-    randoms: Randoms,
+    pub(crate) randoms: Randoms,
 
     /// 常用颜色
     color: Vec<Color>,
@@ -41,7 +41,7 @@ pub(crate) struct Captcha {
     char_type: CaptchaType,
 
     /// 当前验证码
-    chars: Option<String>,
+    pub(crate) chars: Option<String>,
 }
 
 /// 验证码文本类型
@@ -337,7 +337,7 @@ impl Captcha {
 /// 验证码的抽象方法
 pub trait AbstractCaptcha {
     /// 验证码输出,抽象方法，由子类实现
-    fn out(&mut self, os: impl Write) -> bool;
+    fn out(&mut self, out: impl Write) -> bool;
 
     /// 输出Base64编码
     fn base64(&mut self) -> String;

@@ -65,7 +65,7 @@ impl Randoms {
 
     /// 产生两个数之间的随机数
     pub fn num_between(&mut self, min: i32, max: i32) -> i32 {
-        min + self.random.gen::<i32>() % (max - min)
+        min + (self.random.gen::<usize>() % (max - min) as usize) as i32
     }
 
     /// 产生0-num的随机数,不包括num
