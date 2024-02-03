@@ -1,0 +1,3 @@
+//! Static alphabetical PNG Captcha
+//!
+//!
