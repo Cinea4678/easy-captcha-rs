@@ -17,8 +17,12 @@ keywords = ["captcha"]
 [dependencies]
 font-kit = "0.11.0"
 rand = "0.8.5"
-raqote = "0.8.3"
+raqote = { version = "0.8.3", default-features = false, features = ["font-kit", "pathfinder_geometry", "text"] }
 rust-embed = "8.2.0"
 sw-composite = "0.7.16"
 tempfile = "3.9.0"
 log = "0.4.20"
+parking_lot = "0.12.1"
+lazy_static = "1.4.0"
+png = "0.17.11"
+base64 = "0.21.7"

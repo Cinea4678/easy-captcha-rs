@@ -1,12 +1,15 @@
 use crate::base::randoms::Randoms;
 use crate::utils;
 use crate::utils::color::Color;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use font_kit::font::Font;
 use font_kit::loaders::default::NativeFont;
 use font_kit::properties::Style;
 use log::error;
 use raqote::{DrawOptions, DrawTarget, PathBuilder, SolidSource, Source, StrokeStyle};
 use std::io::Write;
+use std::sync::Arc;
 
 /// 验证码抽象类
 pub(crate) struct Captcha {
@@ -20,19 +23,19 @@ pub(crate) struct Captcha {
     font_names: [&'static str; 10],
 
     /// 验证码的字体
-    font: Option<Font>,
+    font: Option<Arc<Font>>,
 
     /// 验证码的字体大小
     font_size: f32,
 
     /// 验证码随机字符长度
-    len: usize,
+    pub len: usize,
 
     /// 验证码显示宽度
-    width: i32,
+    pub width: i32,
 
     /// 验证码显示高度
-    height: i32,
+    pub height: i32,
 
     /// 验证码类型
     char_type: CaptchaType,
@@ -220,7 +223,7 @@ impl Captcha {
                 &path,
                 &Source::Solid(SolidSource::from(color)),
                 &StrokeStyle {
-                    width: 1.,
+                    width: 2.,
                     ..Default::default()
                 },
                 &DrawOptions::new(),
@@ -235,8 +238,8 @@ impl Captcha {
             let color: raqote::Color = color.into();
 
             let w = 5 + self.randoms.num(10);
-            let x = self.randoms.num(self.width as usize - 25);
-            let y = self.randoms.num(self.height as usize - 15);
+            let x = self.randoms.num(self.width as usize - 25) + w;
+            let y = self.randoms.num(self.height as usize - 15) + w;
 
             let mut pb = PathBuilder::new();
             pb.arc(x as f32, y as f32, w as f32, 0., 2. * std::f32::consts::PI);
@@ -246,7 +249,7 @@ impl Captcha {
                 &path,
                 &Source::Solid(SolidSource::from(color)),
                 &StrokeStyle {
-                    width: 1.,
+                    width: 2.,
                     ..Default::default()
                 },
                 &DrawOptions::new(),
@@ -273,7 +276,7 @@ impl Captcha {
             }
 
             let mut pb = PathBuilder::new();
-            pb.move_to(x1 as f32, x2 as f32);
+            pb.move_to(x1 as f32, y1 as f32);
 
             if self.randoms.num(2) == 0 {
                 // 二阶曲线
@@ -293,7 +296,7 @@ impl Captcha {
                 &path,
                 &Source::Solid(SolidSource::from(color)),
                 &StrokeStyle {
-                    width: 1.,
+                    width: 2.,
                     ..Default::default()
                 },
                 &DrawOptions::new(),
@@ -301,14 +304,18 @@ impl Captcha {
         }
     }
 
-    pub fn get_font(&mut self) -> Font {
+    pub fn get_font(&mut self) -> Arc<Font> {
         if self.font.is_none() {
             self.set_font_by_enum(CaptchaFont::Font1, None);
         }
         return self.font.clone().unwrap();
     }
 
-    pub fn set_font_by_font(&mut self, font: Font, size: Option<f32>) {
+    pub fn get_font_size(&mut self) -> f32 {
+        self.font_size
+    }
+
+    pub fn set_font_by_font(&mut self, font: Arc<Font>, size: Option<f32>) {
         self.font = Some(font);
         self.font_size = size.unwrap_or(32.);
     }
@@ -316,11 +323,11 @@ impl Captcha {
     pub fn set_font_by_enum(&mut self, font: CaptchaFont, size: Option<f32>) {
         let font_name = self.font_names[font as usize];
         match utils::font::get_font(font_name) {
-            Ok(font) => {
-                self.font = font;
+            Some(font) => {
+                self.font = Some(font);
                 self.font_size = size.unwrap_or(32.);
             }
-            Err(_) => {
+            None => {
                 error!("Set font by enum failed.")
             }
         }
@@ -330,16 +337,18 @@ impl Captcha {
 /// 验证码的抽象方法
 pub trait AbstractCaptcha {
     /// 验证码输出,抽象方法，由子类实现
-    fn out(os: impl Write) -> bool;
+    fn out(&mut self, os: impl Write) -> bool;
 
     /// 输出Base64编码
-    fn base64() -> String;
+    fn base64(&mut self) -> String;
 
     /// 获取图片类型
-    fn get_content_type() -> String;
+    fn get_content_type(&mut self) -> String;
 
     /// 输出Base64编码（包含编码头）
-    fn base64_with_head(_type: &str) -> String {
-        return String::from(_type) + &Self::base64();
+    fn base64_with_head(&mut self, _type: &str) -> String {
+        let mut output_stream = Vec::new();
+        self.out(&mut output_stream);
+        String::from(_type) + &BASE64_STANDARD.encode(&output_stream)
     }
 }
