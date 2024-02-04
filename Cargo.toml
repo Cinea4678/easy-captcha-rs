@@ -2,7 +2,7 @@ workspace = { members = ["examples/axum-tower-sessions"] }
 [package]
 name = "easy-captcha"
 description = "The Rust implement of the Java captcha library whvcse/EasyCaptcha."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Zhang Yao <cineazhan@icloud.com>"]
 license = "MIT OR Apache-2.0"
