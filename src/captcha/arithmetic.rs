@@ -3,8 +3,10 @@
 //! PNG格式算术验证码
 //!
 
-use crate::base::captcha::AbstractCaptcha;
+use crate::base::captcha::{AbstractCaptcha, Captcha};
+use crate::captcha::gif::GifCaptcha;
 use crate::captcha::spec::SpecCaptcha;
+use crate::NewCaptcha;
 use font_kit::font::Font;
 use std::io::Write;
 use std::ops::Add;
@@ -95,46 +97,6 @@ pub struct ArithmeticCaptcha {
 }
 
 impl ArithmeticCaptcha {
-    pub fn new() -> Self {
-        let mut spec = SpecCaptcha::new();
-        spec.captcha.len = 2;
-
-        let arithmetic_string = None;
-        let difficulty = 10;
-        let algorithm_sign = 4;
-
-        Self {
-            spec,
-            arithmetic_string,
-            difficulty,
-            algorithm_sign,
-        }
-    }
-
-    pub fn with_size(width: i32, height: i32) -> Self {
-        let mut sf = Self::new();
-        sf.spec.captcha.width = width;
-        sf.spec.captcha.height = height;
-        sf
-    }
-
-    pub fn with_size_and_len(width: i32, height: i32, len: usize) -> Self {
-        let mut sf = Self::new();
-        sf.spec.captcha.width = width;
-        sf.spec.captcha.height = height;
-        sf.spec.captcha.len = len;
-        sf
-    }
-
-    pub fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>) -> Self {
-        let mut sf = Self::new();
-        sf.spec.captcha.width = width;
-        sf.spec.captcha.height = height;
-        sf.spec.captcha.len = len;
-        sf.spec.captcha.set_font_by_font(Arc::clone(font), None);
-        sf
-    }
-
     pub fn alphas(&mut self) -> Vec<char> {
         let len = self.spec.captcha.len;
         let ref mut randoms = self.spec.captcha.randoms;
@@ -240,8 +202,54 @@ impl ArithmeticCaptcha {
     }
 }
 
+impl NewCaptcha for ArithmeticCaptcha {
+    fn new() -> Self {
+        let mut spec = SpecCaptcha::new();
+        spec.captcha.len = 2;
+
+        let arithmetic_string = None;
+        let difficulty = 10;
+        let algorithm_sign = 4;
+
+        Self {
+            spec,
+            arithmetic_string,
+            difficulty,
+            algorithm_sign,
+        }
+    }
+
+    fn with_size(width: i32, height: i32) -> Self {
+        let mut _self = Self::new();
+        _self.spec.captcha.width = width;
+        _self.spec.captcha.height = height;
+        _self
+    }
+
+    fn with_size_and_len(width: i32, height: i32, len: usize) -> Self {
+        let mut sf = Self::new();
+        sf.spec.captcha.width = width;
+        sf.spec.captcha.height = height;
+        sf.spec.captcha.len = len;
+        sf
+    }
+
+    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+        let mut sf = Self::new();
+        sf.spec.captcha.width = width;
+        sf.spec.captcha.height = height;
+        sf.spec.captcha.len = len;
+        sf.spec
+            .captcha
+            .set_font_by_font(Arc::clone(font), Some(font_size));
+        sf
+    }
+}
+
 impl AbstractCaptcha for ArithmeticCaptcha {
-    fn out(&mut self, out: impl Write) -> bool {
+    type Error = png::EncodingError;
+
+    fn out(&mut self, out: impl Write) -> Result<(), Self::Error> {
         if self.arithmetic_string.is_none() {
             self.alphas();
         }
@@ -252,7 +260,14 @@ impl AbstractCaptcha for ArithmeticCaptcha {
         )
     }
 
-    fn base64(&mut self) -> String {
+    fn get_chars(&mut self) -> Vec<char> {
+        if self.arithmetic_string.is_none() {
+            self.alphas();
+        }
+        self.spec.captcha.chars.clone().unwrap().chars().collect()
+    }
+
+    fn base64(&mut self) -> Result<String, Self::Error> {
         self.spec.base64_with_head("data:image/png;base64,")
     }
 
@@ -261,16 +276,16 @@ impl AbstractCaptcha for ArithmeticCaptcha {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use std::fs::File;
-
-    #[test]
-    fn it_works() {
-        let mut file = File::create("test2.png").unwrap();
-        let mut captcha = ArithmeticCaptcha::new();
-        captcha.out(&mut file);
-        println!("{}", captcha.spec.captcha.chars.unwrap())
-    }
-}
+// #[cfg(test)]
+// mod test {
+//     use super::*;
+//     use std::fs::File;
+//
+//     #[test]
+//     fn it_works() {
+//         let mut file = File::create("test2.png").unwrap();
+//         let mut captcha = ArithmeticCaptcha::new();
+//         captcha.out(&mut file);
+//         println!("{}", captcha.spec.captcha.chars.unwrap())
+//     }
+// }

@@ -4,6 +4,12 @@ use std::fmt::{Debug, Formatter};
 #[derive(Clone)]
 pub struct Color(f64, f64, f64, f64);
 
+impl Color {
+    pub fn set_alpha(&mut self, a: f64) {
+        self.3 = a;
+    }
+}
+
 impl Debug for Color {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Color")
@@ -47,7 +53,7 @@ impl Into<u32> for Color {
 impl Into<raqote::Color> for Color {
     fn into(self) -> raqote::Color {
         let color: (u8, u8, u8, u8) = self.into();
-        sw_composite::Color::new(color.3, color.0, color.1, color.2)
+        raqote::Color::new(color.3, color.0, color.1, color.2)
     }
 }
 

@@ -1,0 +1,14 @@
+[package]
+name = "axum-tower-sessions"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+axum = "0.7.4"
+tower-sessions = "0.10.1"
+time = "0.3.34"
+easy-captcha = { path = "../..", features = ["axum-tower-sessions"] }
+async-trait = "0.1.77"

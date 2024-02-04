@@ -4,7 +4,9 @@
 //!
 
 use crate::base::captcha::{AbstractCaptcha, Captcha};
+use crate::captcha::gif::GifCaptcha;
 use crate::utils::png::WritePng;
+use crate::NewCaptcha;
 use font_kit::canvas::RasterizationOptions;
 use font_kit::font::Font;
 use font_kit::hinting::HintingOptions;
@@ -18,38 +20,12 @@ pub struct SpecCaptcha {
 }
 
 impl SpecCaptcha {
-    pub fn new() -> Self {
-        Self {
-            captcha: Captcha::new(),
-        }
-    }
-
-    pub fn with_size(width: i32, height: i32) -> Self {
-        let mut sf = Self::new();
-        sf.captcha.width = width;
-        sf.captcha.height = height;
-        sf
-    }
-
-    pub fn with_size_and_len(width: i32, height: i32, len: usize) -> Self {
-        let mut sf = Self::new();
-        sf.captcha.width = width;
-        sf.captcha.height = height;
-        sf.captcha.len = len;
-        sf
-    }
-
-    pub fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>) -> Self {
-        let mut sf = Self::new();
-        sf.captcha.width = width;
-        sf.captcha.height = height;
-        sf.captcha.len = len;
-        sf.captcha.set_font_by_font(Arc::clone(font), None);
-        sf
-    }
-
     /// 生成验证码图形
-    pub(crate) fn graphics_image(&mut self, str: &Vec<char>, out: impl Write) -> bool {
+    pub(crate) fn graphics_image(
+        &mut self,
+        str: &Vec<char>,
+        out: impl Write,
+    ) -> Result<(), png::EncodingError> {
         let width = self.captcha.width;
         let height = self.captcha.height;
 
@@ -119,17 +95,49 @@ impl SpecCaptcha {
             )
         }
 
-        dt.write_png(out).is_ok()
+        dt.write_png(out)
+    }
+}
+
+impl NewCaptcha for SpecCaptcha {
+    fn new() -> Self {
+        Self {
+            captcha: Captcha::new(),
+        }
+    }
+
+    fn with_size(width: i32, height: i32) -> Self {
+        Self {
+            captcha: Captcha::with_size(width, height),
+        }
+    }
+
+    fn with_size_and_len(width: i32, height: i32, len: usize) -> Self {
+        Self {
+            captcha: Captcha::with_size_and_len(width, height, len),
+        }
+    }
+
+    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+        Self {
+            captcha: Captcha::with_all(width, height, len, font, font_size),
+        }
     }
 }
 
 impl AbstractCaptcha for SpecCaptcha {
-    fn out(&mut self, out: impl Write) -> bool {
+    type Error = png::EncodingError;
+
+    fn out(&mut self, out: impl Write) -> Result<(), Self::Error> {
         let text_char = self.captcha.text_char();
         self.graphics_image(&text_char, out)
     }
 
-    fn base64(&mut self) -> String {
+    fn get_chars(&mut self) -> Vec<char> {
+        self.captcha.text_char()
+    }
+
+    fn base64(&mut self) -> Result<String, Self::Error> {
         self.base64_with_head("data:image/png;base64,")
     }
 
@@ -140,9 +148,6 @@ impl AbstractCaptcha for SpecCaptcha {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::base::captcha::CaptchaFont;
-
     #[test]
     fn it_works() {}
 }

@@ -1,6 +1,5 @@
 //! 处理PNG的编码和转换
 
-use crate::captcha::spec::SpecCaptcha;
 use png::EncodingError;
 use raqote::DrawTarget;
 use std::io::Write;

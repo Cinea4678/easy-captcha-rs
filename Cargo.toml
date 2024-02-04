@@ -1,3 +1,4 @@
+workspace = { members = ["examples/axum-tower-sessions"] }
 [package]
 name = "easy-captcha"
 description = "The Rust implement of the Java captcha library whvcse/EasyCaptcha."
@@ -14,12 +15,14 @@ keywords = ["captcha"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+axum-tower-sessions = ["axum", "tower-sessions"]
+
 [dependencies]
 font-kit = "0.11.0"
 rand = "0.8.5"
 raqote = { version = "0.8.3", default-features = false, features = ["font-kit", "pathfinder_geometry", "text"] }
 rust-embed = "8.2.0"
-sw-composite = "0.7.16"
 tempfile = "3.9.0"
 log = "0.4.20"
 parking_lot = "0.12.1"
@@ -27,3 +30,9 @@ lazy_static = "1.4.0"
 png = "0.17.11"
 base64 = "0.21.7"
 evalexpr = "11.3.0"
+gif = "0.13.1"
+derive_builder = "0.13.0"
+axum = {version = "0.7.4", optional = true}
+tower-sessions = {version = "0.10.1", optional = true}
+async-trait = { version = "0.1.77", features = [] }
+
