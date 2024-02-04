@@ -1,10 +1,9 @@
-use rand::rngs::ThreadRng;
-use rand::{thread_rng, Rng};
+
+use rand::{random};
+
 
 /// 随机数工具类
 pub(crate) struct Randoms {
-    random: ThreadRng,
-
     /// 定义验证码字符.去除了0、O、I、L等容易混淆的字母
     pub alpha: [char; 54],
 
@@ -32,8 +31,6 @@ pub(crate) struct Randoms {
 
 impl Randoms {
     pub fn new() -> Self {
-        let random = thread_rng();
-
         // Defines the Captcha characters, removing characters like 0, O, I, l, etc.
         let alpha = [
             '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J',
@@ -51,7 +48,6 @@ impl Randoms {
         let lower_max_index = char_max_index;
 
         Self {
-            random,
             alpha,
             num_max_index,
             char_min_index,
@@ -65,12 +61,12 @@ impl Randoms {
 
     /// 产生两个数之间的随机数
     pub fn num_between(&mut self, min: i32, max: i32) -> i32 {
-        min + (self.random.gen::<usize>() % (max - min) as usize) as i32
+        min + (random::<usize>() % (max - min) as usize) as i32
     }
 
     /// 产生0-num的随机数,不包括num
     pub fn num(&mut self, num: usize) -> usize {
-        self.random.gen::<usize>() % num
+        random::<usize>() % num
     }
 
     /// 返回ALPHA中的随机字符

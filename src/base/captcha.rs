@@ -1,10 +1,11 @@
 use crate::base::randoms::Randoms;
-use crate::utils;
+
 use crate::utils::color::Color;
+use crate::utils::font;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use font_kit::font::Font;
-use log::error;
+
 use raqote::{DrawOptions, DrawTarget, PathBuilder, SolidSource, Source, StrokeStyle};
 use std::fmt::Debug;
 use std::io::Write;
@@ -22,7 +23,7 @@ pub(crate) struct Captcha {
     font_names: [&'static str; 10],
 
     /// 验证码的字体
-    font: Option<Arc<Font>>,
+    font_name: String,
 
     /// 验证码的字体大小
     font_size: f32,
@@ -43,7 +44,7 @@ pub(crate) struct Captcha {
     pub(crate) chars: Option<String>,
 }
 
-/// 验证码文本类型
+/// 验证码文本类型 The character type of the captcha
 pub enum CaptchaType {
     /// 字母数字混合
     TypeDefault = 1,
@@ -64,17 +65,27 @@ pub enum CaptchaType {
     TypeNumAndUpper,
 }
 
-/// 内置字体
+/// 内置字体 Fonts shipped with the library
 pub enum CaptchaFont {
+    /// actionj
     Font1,
+    /// epilog
     Font2,
+    /// fresnel
     Font3,
+    /// headache
     Font4,
+    /// lexo
     Font5,
+    /// prefix
     Font6,
+    /// progbot
     Font7,
+    /// ransom
     Font8,
+    /// robot
     Font9,
+    /// scandal
     Font10,
 }
 
@@ -276,38 +287,25 @@ impl Captcha {
     }
 
     pub fn get_font(&mut self) -> Arc<Font> {
-        if self.font.is_none() {
-            self.set_font_by_enum(CaptchaFont::Font1, None);
+        if let Some(font) = font::get_font(&self.font_name) {
+            font
+        } else {
+            font::get_font(self.font_names[0]).unwrap()
         }
-        return self.font.clone().unwrap();
     }
 
     pub fn get_font_size(&mut self) -> f32 {
         self.font_size
     }
 
-    pub fn set_font_by_font(&mut self, font: Arc<Font>, size: Option<f32>) {
-        self.font = Some(font);
-        self.font_size = size.unwrap_or(32.);
-    }
-
     pub fn set_font_by_enum(&mut self, font: CaptchaFont, size: Option<f32>) {
         let font_name = self.font_names[font as usize];
-        match utils::font::get_font(font_name) {
-            Some(font) => {
-                self.font = Some(font);
-                self.font_size = size.unwrap_or(32.);
-            }
-            None => {
-                error!("Set font by enum failed.")
-            }
-        }
+        self.font_name = font_name.into();
+        self.font_size = size.unwrap_or(32.);
     }
 }
 
-/// 初始化验证码的抽象方法
-///
-/// Traits for initialize a Captcha instance.
+/// 初始化验证码的抽象方法 Traits for initialize a Captcha instance.
 pub trait NewCaptcha
 where
     Self: Sized,
@@ -342,7 +340,7 @@ where
     ///
     /// 关于`len`字段的注意事项，请参见[with_size_and_len](Self::with_size_and_len)中的说明。Refer to the document of
     /// [with_size_and_len](Self::with_size_and_len) for the precautions of the `len` property.
-    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self;
+    fn with_all(width: i32, height: i32, len: usize, font: CaptchaFont, font_size: f32) -> Self;
 }
 
 impl NewCaptcha for Captcha {
@@ -378,7 +376,7 @@ impl NewCaptcha for Captcha {
             "scandal.ttf",
         ];
 
-        let font = None;
+        let font_name = font_names[0].into();
         let font_size = 32.;
         let len = 5;
         let width = 130;
@@ -390,7 +388,7 @@ impl NewCaptcha for Captcha {
             randoms: Randoms::new(),
             color,
             font_names,
-            font,
+            font_name,
             font_size,
             len,
             width,
@@ -415,22 +413,21 @@ impl NewCaptcha for Captcha {
         _self
     }
 
-    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+    fn with_all(width: i32, height: i32, len: usize, font: CaptchaFont, font_size: f32) -> Self {
         let mut _self = Self::new();
         _self.width = width;
         _self.height = height;
         _self.len = len;
-        _self.set_font_by_font(Arc::clone(font), None);
+        _self.set_font_by_enum(font, None);
         _self.font_size = font_size;
         _self
     }
 }
 
-/// 验证码的抽象方法
-///
-/// Traits which a Captcha must implements.
+/// 验证码的抽象方法  Traits which a Captcha must implements.
 pub trait AbstractCaptcha: NewCaptcha {
-    type Error: Debug;
+    /// 错误类型
+    type Error: std::error::Error + Debug + Send + Sync + 'static;
 
     /// 输出验证码到指定位置
     ///

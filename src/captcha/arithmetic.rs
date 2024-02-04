@@ -3,18 +3,18 @@
 //! PNG格式算术验证码
 //!
 
-use crate::base::captcha::{AbstractCaptcha, Captcha};
-use crate::captcha::gif::GifCaptcha;
+use crate::base::captcha::AbstractCaptcha;
+
 use crate::captcha::spec::SpecCaptcha;
-use crate::NewCaptcha;
-use font_kit::font::Font;
+use crate::{CaptchaFont, NewCaptcha};
+
 use std::io::Write;
 use std::ops::Add;
-use std::sync::Arc;
 
+/// 算术验证码中使用的符号
 #[derive(Debug, PartialEq)]
-pub enum Symbol {
-    /// 标识符
+enum Symbol {
+    /// 操作数
     NUM { value: &'static str, priority: bool },
     /// 加法
     ADD { value: &'static str, priority: bool },
@@ -97,6 +97,9 @@ pub struct ArithmeticCaptcha {
 }
 
 impl ArithmeticCaptcha {
+    /// 生成一个算式
+    ///
+    /// Generate a new arithmetic problem.
     pub fn alphas(&mut self) -> Vec<char> {
         let len = self.spec.captcha.len;
         let ref mut randoms = self.spec.captcha.randoms;
@@ -173,6 +176,9 @@ impl ArithmeticCaptcha {
         self.spec.captcha.chars.clone().unwrap().chars().collect()
     }
 
+    /// 获取算式的字符串
+    ///
+    /// Get the String of the arithmetic problem
     pub fn get_arithmetic_string(&mut self) -> String {
         if self.arithmetic_string.is_none() {
             self.alphas();
@@ -181,6 +187,9 @@ impl ArithmeticCaptcha {
         self.arithmetic_string.clone().unwrap()
     }
 
+    /// 设置算术的难度；默认值为10
+    ///
+    /// Set the difficulty of the arithmetic problem; default as 10.
     pub fn set_difficulty(&mut self, difficulty: usize) {
         // 做上下界检测，避免越界
         if difficulty <= 0 {
@@ -190,6 +199,10 @@ impl ArithmeticCaptcha {
         }
     }
 
+    /// 设置包含的算术符号。可选2~5，难度依次由低到高（加-减-乘-除）
+    ///
+    /// Set the arithmetic symbol used in the arithmetic problem; Available from 2 to 5, which includes Plus, Minus,
+    /// Multiply and Divide.
     pub fn support_algorithm_sign(&mut self, algorithm_sign: usize) {
         // 做上下界检测，避免越界
         self.algorithm_sign = if algorithm_sign < 2 {
@@ -234,14 +247,12 @@ impl NewCaptcha for ArithmeticCaptcha {
         sf
     }
 
-    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+    fn with_all(width: i32, height: i32, len: usize, font: CaptchaFont, font_size: f32) -> Self {
         let mut sf = Self::new();
         sf.spec.captcha.width = width;
         sf.spec.captcha.height = height;
         sf.spec.captcha.len = len;
-        sf.spec
-            .captcha
-            .set_font_by_font(Arc::clone(font), Some(font_size));
+        sf.spec.captcha.set_font_by_enum(font, Some(font_size));
         sf
     }
 }

@@ -4,6 +4,7 @@ use rust_embed::RustEmbed;
 use std::error::Error;
 use std::sync::Arc;
 
+
 #[derive(RustEmbed)]
 #[folder = "resources/"]
 struct FontAssets;

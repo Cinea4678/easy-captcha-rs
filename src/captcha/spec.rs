@@ -4,15 +4,16 @@
 //!
 
 use crate::base::captcha::{AbstractCaptcha, Captcha};
-use crate::captcha::gif::GifCaptcha;
+
 use crate::utils::png::WritePng;
-use crate::NewCaptcha;
+use crate::{CaptchaFont, NewCaptcha};
 use font_kit::canvas::RasterizationOptions;
-use font_kit::font::Font;
+
 use font_kit::hinting::HintingOptions;
 use raqote::{DrawOptions, DrawTarget, Point, SolidSource, Source};
 use std::io::Write;
-use std::sync::Arc;
+
+
 
 /// PNG格式验证码
 pub struct SpecCaptcha {
@@ -118,7 +119,7 @@ impl NewCaptcha for SpecCaptcha {
         }
     }
 
-    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+    fn with_all(width: i32, height: i32, len: usize, font: CaptchaFont, font_size: f32) -> Self {
         Self {
             captcha: Captcha::with_all(width, height, len, font, font_size),
         }

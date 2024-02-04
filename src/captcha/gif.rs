@@ -4,16 +4,15 @@
 //!
 
 use crate::base::captcha::{AbstractCaptcha, Captcha};
-use crate::captcha::spec::SpecCaptcha;
+
 use crate::utils::color::Color;
-use crate::NewCaptcha;
+use crate::{CaptchaFont, NewCaptcha};
 use font_kit::canvas::RasterizationOptions;
-use font_kit::font::Font;
+
 use font_kit::hinting::HintingOptions;
 use gif::Repeat;
 use raqote::{BlendMode, DrawOptions, DrawTarget, Point, SolidSource, Source, StrokeStyle};
 use std::io::Write;
-use std::sync::Arc;
 
 /// GIF动态验证码
 pub struct GifCaptcha {
@@ -176,7 +175,7 @@ impl NewCaptcha for GifCaptcha {
         }
     }
 
-    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+    fn with_all(width: i32, height: i32, len: usize, font: CaptchaFont, font_size: f32) -> Self {
         Self {
             captcha: Captcha::with_all(width, height, len, font, font_size),
         }
@@ -223,13 +222,14 @@ impl AbstractCaptcha for GifCaptcha {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::captcha::arithmetic::ArithmeticCaptcha;
     use std::fs::File;
 
     #[test]
     fn it_works() {
-        let mut file = File::create("test.gif").unwrap();
-        let mut captcha = GifCaptcha::new();
+        let mut file = File::create("test.png").unwrap();
+        let mut captcha = ArithmeticCaptcha::new();
+        captcha.spec.captcha.len = 3;
         captcha.out(&mut file).unwrap();
-        println!("{}", captcha.captcha.chars.unwrap())
     }
 }

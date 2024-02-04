@@ -12,3 +12,5 @@ tower-sessions = "0.10.1"
 time = "0.3.34"
 easy-captcha = { path = "../..", features = ["axum-tower-sessions"] }
 async-trait = "0.1.77"
+axum-macros = "0.4.1"
+anyhow = "1.0.79"

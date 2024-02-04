@@ -35,4 +35,6 @@ derive_builder = "0.13.0"
 axum = {version = "0.7.4", optional = true}
 tower-sessions = {version = "0.10.1", optional = true}
 async-trait = { version = "0.1.77", features = [] }
+axum-macros = "0.4.1"
+anyhow = "1.0.79"
 

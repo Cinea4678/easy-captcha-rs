@@ -1,4 +1,4 @@
-//! Extensions to web frameworks, like axum-tower_session.
+//! 针对于Web框架的扩展 Extensions to web frameworks, like axum-tower_session.
 //!
 //! 针对于Web框架的扩展（如axum-tower_session这样的组合）
 
@@ -7,9 +7,7 @@ pub mod axum_tower_sessions;
 
 use crate::base::captcha::AbstractCaptcha;
 use crate::captcha::spec::SpecCaptcha;
-use crate::NewCaptcha;
-use font_kit::font::Font;
-use std::sync::Arc;
+use crate::{CaptchaFont, NewCaptcha};
 
 /// 验证码工具类 - Captcha Utils
 ///
@@ -40,7 +38,7 @@ impl<T: AbstractCaptcha> NewCaptcha for CaptchaUtil<T> {
         }
     }
 
-    fn with_all(width: i32, height: i32, len: usize, font: &Arc<Font>, font_size: f32) -> Self {
+    fn with_all(width: i32, height: i32, len: usize, font: CaptchaFont, font_size: f32) -> Self {
         Self {
             captcha_instance: T::with_all(width, height, len, font, font_size),
         }
