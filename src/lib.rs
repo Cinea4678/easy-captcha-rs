@@ -13,6 +13,13 @@
 //!
 //! <br/>
 //!
+//! ## 安装 Install
+//!
+//! 请参考Github README为Linux系统安装依赖。
+//!
+//! If you are compiling this project in linux, please refer to README in repository to install
+//! dependencies into you system.
+//!
 //! ## 使用 Usage
 //!
 //! 若您正在使用的框架已适配，您可直接通过[CaptchaUtil](extension::CaptchaUtil)类（并导入相应框架的trait）来使用验证码：

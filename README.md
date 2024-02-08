@@ -39,6 +39,15 @@ Rust图形验证码，由Java同名开源库[whvcse/EasyCaptcha](https://github.
 
 ## 安装和使用
 
+**在Linux系统上需要安装`pkg-config`和`fontconfig`**，关于`fontconfig`的选择请参考[fontconfig-rs](https://github.com/yeslogic/fontconfig-rs)
+中的提示；具体依赖对应如下：
+
+* Alpine Linux: `pkg-config fontconfig-dev`
+* Arch Linux: `pkg-config fontconfig`
+* Debian-based systems: `pkg-config libfontconfig1-dev`
+* FreeBSD: `pkg-config fontconfig`
+* Void Linux: `pkg-config fontconfig-devel`
+
 ```shell
 cargo add easy-captcha
 ```

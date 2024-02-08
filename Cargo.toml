@@ -2,7 +2,7 @@ workspace = { members = ["examples/axum-tower-sessions"] }
 [package]
 name = "easy-captcha"
 description = "The Rust implement of the Java captcha library whvcse/EasyCaptcha."
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Zhang Yao <cineazhan@icloud.com>"]
 license = "MIT OR Apache-2.0"
@@ -21,7 +21,7 @@ axum-tower-sessions = ["axum", "tower-sessions"]
 [dependencies]
 font-kit = "0.11.0"
 rand = "0.8.5"
-raqote = { version = "0.8.3", default-features = false, features = ["font-kit", "pathfinder_geometry", "text"] }
+raqote = { version = "0.8.3", default-features = false, features = ["text"] }
 rust-embed = "8.2.0"
 tempfile = "3.9.0"
 log = "0.4.20"
