@@ -4,7 +4,6 @@ use rust_embed::RustEmbed;
 use std::error::Error;
 use std::sync::Arc;
 
-
 #[derive(RustEmbed)]
 #[folder = "resources/"]
 struct FontAssets;
@@ -36,7 +35,7 @@ pub fn get_font(font_name: &str) -> Option<Arc<Font>> {
 pub fn load_font(font_name: &str) -> Result<Option<Font>, Box<dyn Error>> {
     match FontAssets::get(font_name) {
         Some(assets) => {
-            let font = Font::from_bytes(Arc::new(Vec::from(assets.data)), 2)?;
+            let font = Font::from_bytes(Arc::new(Vec::from(assets.data)), 0)?;
             Ok(Some(font))
         }
         None => {
